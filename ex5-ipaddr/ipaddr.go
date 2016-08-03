@@ -13,12 +13,11 @@ func (ip IPAddr) String() string {
 	// return fmt.Sprintf("%v.%v.%v.%v", ip[0], ip[1], ip[2], ip[3])
 	
 	var dottedIP string
-	
+	// Assume we don't know the number of IP numsets.
 	for i, numset := range ip {
+		if i > 0 { dottedIP += "." }
 		dottedIP += strconv.Itoa(int(numset))
-		if i < 3 { dottedIP += "." }
 	}
-	
 	return fmt.Sprintf("%q", dottedIP)
 }
 
