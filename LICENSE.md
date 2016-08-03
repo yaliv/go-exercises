@@ -1,5 +1,5 @@
-Original work Copyright (c) 2011 The Go Authors.
-Modified work Copyright (c) 2016 Muhammad Yahya Muhaimin.
+Tour of Go Copyright (c) 2011 The Go Authors.  
+My answers Copyright (c) 2016 Muhammad Yahya Muhaimin.  
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
