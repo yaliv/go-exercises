@@ -23,13 +23,13 @@ func Walk(t *tree.Tree, ch chan int, ends ...*int) {
 
 	// Here we have left branch.
 	if t.Left != nil {
-		br++
 		go Walk(t.Left, ch, en)
+		br++
 	}
 	// Here we have right branch.
 	if t.Right != nil {
-		br++
 		go Walk(t.Right, ch, en)
+		br++
 	}
 
 	switch br {
@@ -48,14 +48,40 @@ func Walk(t *tree.Tree, ch chan int, ends ...*int) {
 // Same determines whether the trees
 // t1 and t2 contain the same values.
 func Same(t1, t2 *tree.Tree) bool {
-	return t1 == t2
+	// Create two channels.
+	ch1, ch2 := make(chan int), make(chan int)
+	// Kick off the walkers.
+	go Walk(t1, ch1)
+	go Walk(t2, ch2)
+
+	// Receive values from Channel 1 to a cache,
+	// let's call it cv (cached values).
+	var cv1 []int
+	for v1 := range ch1 {
+		cv1 = append(cv1, v1)
+	}
+
+	// Receive values from Channel 2
+	// while compare with Channel 1.
+	var haveSame bool
+	for v2 := range ch2 {
+		haveSame = false
+		for _, v1 := range cv1 {
+			if v1 == v2 {
+				haveSame = true
+				break
+			}
+		}
+		if !haveSame { return false }
+	}
+	// All values from the two channels are SAME.
+	return true
 }
 
 func main() {
-	ch := make(chan int)
-
 	// Test the `Walk` function.
 	fmt.Println("`Walk` Function Test")
+	ch := make(chan int)
 	go Walk(tree.New(1), ch)
 	// Assume we don't know the number of tree values.
 	var nums bool
@@ -67,5 +93,9 @@ func main() {
 	fmt.Println()
 
 	// Test the `Same` function.
-	//fmt.Println("`Same` Function Test")
+	fmt.Println("`Same` Function Test")
+	k1, k2 := 1, 1
+	fmt.Printf( "Tree %v & %v: %v\n", k1, k2, Same(tree.New(k1), tree.New(k2)) )
+	k1, k2 = 1, 2
+	fmt.Printf( "Tree %v & %v: %v\n", k1, k2, Same(tree.New(k1), tree.New(k2)) )
 }
