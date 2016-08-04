@@ -54,25 +54,19 @@ func Same(t1, t2 *tree.Tree) bool {
 	go Walk(t1, ch1)
 	go Walk(t2, ch2)
 
-	// Receive values from Channel 1 to a cache,
+	// Receive values from Channel 1 to a cache (map),
 	// let's call it cv (cached values).
-	var cv1 []int
+	cv1 := make(map[int]bool)
 	for v1 := range ch1 {
-		cv1 = append(cv1, v1)
+		cv1[v1] = true
 	}
 
 	// Receive values from Channel 2
 	// while compare with Channel 1.
-	var haveSame bool
 	for v2 := range ch2 {
-		haveSame = false
-		for _, v1 := range cv1 {
-			if v1 == v2 {
-				haveSame = true
-				break
-			}
+		if _, ok := cv1[v2]; !ok {
+			return false
 		}
-		if !haveSame { return false }
 	}
 	// All values from the two channels are SAME.
 	return true
