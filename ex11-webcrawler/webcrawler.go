@@ -32,20 +32,15 @@ func (c *Crawler) ReadCU(url string) bool {
 	return false
 }
 
-func (c *Crawler) WriteCU(url string) []string {
+func (c *Crawler) WriteCU(url string) bool {
 	c.mux.Lock()
 	defer c.mux.Unlock()
 	if _, ok := c.cu[url]; ok {
-		return nil
+		return false
 	}
 	// Write URL to cu.
 	c.cu[url] = true
-	// Fetch the URL.
-	body, urls, err := fetcher.Fetch(url)
-	// Send the response to the channel.
-	c.ch <- Response{url: url, body: body, err: err}
-	// Return the slice of URLs.
-	return urls
+	return true
 }
 
 // Crawl uses fetcher to recursively crawl
@@ -63,19 +58,23 @@ func (c *Crawler) Crawl(url string, depth int, fetcher Fetcher) {
 		c.cwls = 1
 	}
 
-	// Write the current URL to cu
-	// and get the slice of URLs in return.
-	urls := c.WriteCU(url)
+	// Write the current URL to cu if not exist.
+	if c.WriteCU(url) {
+		// Fetch the URL.
+		body, urls, err := fetcher.Fetch(url)
+		// Send the response to the channel.
+		c.ch <- Response{url: url, body: body, err: err}
 
-	for _, u := range urls {
-		// Do not crawl an existing cached URL.
-		if c.ReadCU(u) {
-			continue
-		}
-		if depth > 1 {
-			go c.Crawl(u, depth-1, fetcher)
-			// Add new crawler.
-			c.cwls++
+		for _, u := range urls {
+			// Do not crawl an existing cached URL.
+			if c.ReadCU(u) {
+				continue
+			}
+			if depth > 1 {
+				go c.Crawl(u, depth-1, fetcher)
+				// Add new crawler.
+				c.cwls++
+			}
 		}
 	}
 
