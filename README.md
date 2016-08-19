@@ -1,5 +1,5 @@
 # go-exercises
-My answers to the exercises in the [Tour of Go](//tour.golang.org).
+My solutions to the exercises in the [Tour of Go](//tour.golang.org).
 
 Download and install:
 ```
