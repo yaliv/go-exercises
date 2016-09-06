@@ -81,7 +81,7 @@ func (c *Crawler) Crawl(url string, depth int, fetcher Fetcher) {
 	// This crawler has done crawling.
 	c.cwls--
 
-	// All crawlers has done crawling.
+	// All crawlers have done crawling.
 	if c.cwls <= 0 {
 		close(c.ch)
 	}
